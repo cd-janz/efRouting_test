@@ -3,6 +3,7 @@ on:
   push:
     branches: [ main ]
     paths:
+      - .github/workflows
       - 'lambda/**'
 jobs:
   build-deploy-python-lambda:
