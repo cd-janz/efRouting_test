@@ -10,16 +10,17 @@ class DynamoRepositoryImpl(DynamoRepository):
     def __init__(self):
         self.endpoint_url = getenv("DYNAMODB_URL")
         self.table_name = getenv("TABLE_NAME", "SpaceXLaunches")
-        if not self.endpoint_url:
+        if self.endpoint_url:
             self.dynamodb = boto3.resource(
                 'dynamodb',
-                endpoint_url="http://localhost:8000",
+                endpoint_url=self.endpoint_url,
                 region_name='us-east-1',
                 aws_access_key_id='local',
                 aws_secret_access_key='local'
             )
         else:
             self.dynamodb = boto3.resource('dynamodb')
+
         self.table = self.dynamodb.Table(self.table_name)
 
     async def upsert_many_optimized(self, launches: List[LaunchRecord]) -> None:

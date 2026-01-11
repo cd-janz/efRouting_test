@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field, field_validator, field_serializer, computed_field
+from pydantic import BaseModel, Field, field_serializer, computed_field, ValidationError
 from datetime import datetime
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Tuple
+
 
 class LaunchRecord(BaseModel):
     launch_id: str = Field(..., alias="id")
@@ -23,6 +24,13 @@ class LaunchRecord(BaseModel):
             return "upcoming"
         return "success" if self.success else "failed"
 
-    class Config:
+    class ConfigDict:
         populate_by_name = True
         extra = "ignore"
+
+    @classmethod
+    def safe_parse(cls, data: dict) -> Tuple[Optional["LaunchRecord"], Optional[str]]:
+        try:
+            return cls.model_validate(data), None
+        except ValidationError:
+            return None, "Data has invalid format or content, or is empty"

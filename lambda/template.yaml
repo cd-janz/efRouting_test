@@ -44,7 +44,7 @@ Resources:
         ScheduledSync:
           Type: Schedule
           Properties:
-            Schedule: rate(30 minutes)
+            Schedule: rate(6 hours)
             Name: SpaceXScheduledSync
             Enabled: True
             Input: '{"source": "aws.events"}'
@@ -52,14 +52,17 @@ Resources:
   SpaceXTable:
     Type: AWS::Serverless::SimpleTable
     Properties:
+      TableName: SpaceX-Launches-Data
       PrimaryKey:
         Name: launch_id
         Type: String
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
 
 Outputs:
+  SpaceXTableName:
+    Description: "Name of created DynamoDB table"
+    value: !Ref SpaceXTable
+    Export:
+      Name: !Sub "${AWS::StackName}-TableName"
   ApiUrl:
     Description: "URL de la API Gateway"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

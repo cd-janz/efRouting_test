@@ -1,4 +1,5 @@
 services:
+
   dynamodb-local:
     image: amazon/dynamodb-local:latest
     container_name: dynamodb-local
@@ -8,8 +9,15 @@ services:
     volumes:
       - dynamo_data:/home/dynamodblocal/data
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'cat < /dev/null > /dev/tcp/localhost/8000'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
     networks:
       - spacex-network
+
   dynamodb-admin:
     image: aaronshaf/dynamodb-admin
     container_name: dynamodb-admin
@@ -22,6 +30,22 @@ services:
       - AWS_SECRET_ACCESS_KEY=local
     depends_on:
       - dynamodb-local
+    networks:
+      - spacex-network
+
+  fast-api:
+    build:
+      context: lambda
+      dockerfile: Dockerfile
+    container_name: spacex-app
+    ports:
+      - "8080:8000"
+    environment:
+      - DYNAMODB_TABLE_NAME=SpaceXLaunches
+      - DYNAMODB_URL=http://dynamodb-local:8000
+    depends_on:
+      dynamodb-local:
+        condition: service_healthy
     networks:
       - spacex-network
 
