@@ -5,6 +5,7 @@ on:
     paths:
       - .github/workflows
       - 'lambda/**'
+  workflow_dispatch:
 jobs:
   build-deploy-python-lambda:
     runs-on: ubuntu-22.04
