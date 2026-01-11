@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SpaceX ETL Service - API and Scheduled Sync
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Runtime: python3.13
+    Architectures:
+      - arm64
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref SpaceXTable
+        DYNAMODB_URL: ""
+
+Resources:
+  SpaceXFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Zip
+      CodeUri: .
+      Handler: main.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SpaceXTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+
+        ScheduledSync:
+          Type: Schedule
+          Properties:
+            Schedule: rate(30 minutes)
+            Name: SpaceXScheduledSync
+            Enabled: True
+            Input: '{"source": "aws.events"}'
+
+  SpaceXTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: launch_id
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+Outputs:
+  ApiUrl:
+    Description: "URL de la API Gateway"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

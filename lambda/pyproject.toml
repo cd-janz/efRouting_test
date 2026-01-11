@@ -1,0 +1,29 @@
+[project]
+name = "spacex"
+version = "0.1.0"
+description = "Automated Lambda for the SpaceX Launch API ETL process"
+authors = [
+    {name = "cd-janz",email = "cd.juanzuniga@gmail.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi (>=0.128.0,<0.129.0)",
+    "mangum (>=0.20.0,<0.21.0)",
+    "uvicorn (>=0.40.0,<0.41.0)",
+    "httpx (>=0.28.1,<0.29.0)",
+]
+
+[tool.poetry.scripts]
+dev = "spacex.main:run_server"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "boto3 (>= 1.42.25,<2.0.0 )",
+    "boto3-stubs (>=1.42.25,<2.0.0)"
+]
