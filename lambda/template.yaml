@@ -8,7 +8,7 @@ Globals:
     MemorySize: 512
     Runtime: python3.13
     Architectures:
-      - arm64
+      - x86_64
     Environment:
       Variables:
         TABLE_NAME: !Ref SpaceXTable
