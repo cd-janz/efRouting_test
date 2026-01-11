@@ -15,7 +15,7 @@ Globals:
         DYNAMODB_URL: ""
 
 Resources:
-  SpaceXFunction:
+  SpaceXApiFunction:
     Type: AWS::Serverless::Function
     Properties:
       PackageType: Zip
@@ -31,6 +31,16 @@ Resources:
             Path: /{proxy+}
             Method: ANY
 
+  SpaceXCronFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Zip
+      CodeUri: .
+      Handler: main.scheduled_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SpaceXTable
+      Events:
         ScheduledSync:
           Type: Schedule
           Properties:
