@@ -60,7 +60,7 @@ Resources:
 Outputs:
   SpaceXTableName:
     Description: "Name of created DynamoDB table"
-    value: !Ref SpaceXTable
+    Value: !Ref SpaceXTable  # <--- Corregido
     Export:
       Name: !Sub "${AWS::StackName}-TableName"
   ApiUrl:
