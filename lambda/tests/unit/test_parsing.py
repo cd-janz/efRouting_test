@@ -1,10 +1,10 @@
 import unittest
-
 from src.spacex.infra.models.LaunchRecord import LaunchRecord
 from tests.unit.data.launch import launch_data
+import pytest
 
 class TestParsing(unittest.TestCase):
-
+    @pytest.mark.unit
     def test_json_to_launch_record(self):
         res = LaunchRecord.safe_parse(launch_data)
         record = res[0]
@@ -15,6 +15,7 @@ class TestParsing(unittest.TestCase):
         self.assertTrue(record.launch_id is not None)
         self.assertEqual(record.launch_id, launch_data['id'])
 
+    @pytest.mark.unit
     def test_bad_json(self):
         res = LaunchRecord.safe_parse({})
         self.assertTrue(res[0] is None)

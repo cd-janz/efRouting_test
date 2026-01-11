@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends
 from mangum import Mangum
 import uvicorn
+import asyncio
 from httpx import AsyncClient
 from src.spacex.app.services.ETLServices import ETLServices
 from src.spacex.infra.driven_adapters.dynamo_repo_impl import DynamoRepositoryImpl
@@ -51,7 +52,9 @@ async def trigger_optimized_fetch(
     return {"message": res}
 
 handler = Mangum(app)
-async def scheduled_handler(event, context):
+
+async def _run_scheduled_sync(event, context):
+    print("Starting scheduled handler")
     async with AsyncClient() as client:
         repo = LaunchRepositoryImpl(client)
         svc = ETLServices(repo, get_dynamo_repo())
@@ -60,6 +63,9 @@ async def scheduled_handler(event, context):
             return {"status": "success"}
         except Exception as e:
             return {"status": "error", "message": str(e)}
+
+def scheduled_handler(event, context):
+    return asyncio.run(_run_scheduled_sync(event, context))
 
 def run_server():
     uvicorn.run(app, host="0.0.0.0", port=8080)

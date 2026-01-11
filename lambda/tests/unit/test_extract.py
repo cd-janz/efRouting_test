@@ -1,12 +1,13 @@
 import unittest
+import pytest
 from unittest.mock import Mock, AsyncMock
-
 from src.spacex.infra.driven_adapters.launch_repository_impl import LaunchRepositoryImpl
 from src.spacex.infra.models.LaunchRecord import LaunchRecord
 from tests.unit.data.launch import launch_data
 
 
 class ExtractionTest(unittest.IsolatedAsyncioTestCase):
+    @pytest.mark.unit
     async def test_records_filter(self):
         data = [{}, launch_data]
         mock_response = Mock()

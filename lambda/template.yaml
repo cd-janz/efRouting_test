@@ -20,7 +20,7 @@ Resources:
     Properties:
       PackageType: Zip
       CodeUri: .
-      Handler: main.handler
+      Handler: src.spacex.main.handler
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref SpaceXTable
@@ -36,7 +36,7 @@ Resources:
     Properties:
       PackageType: Zip
       CodeUri: .
-      Handler: main.scheduled_handler
+      Handler: src.spacex.main.scheduled_handler
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref SpaceXTable
@@ -60,7 +60,7 @@ Resources:
 Outputs:
   SpaceXTableName:
     Description: "Name of created DynamoDB table"
-    Value: !Ref SpaceXTable  # <--- Corregido
+    Value: !Ref SpaceXTable
     Export:
       Name: !Sub "${AWS::StackName}-TableName"
   ApiUrl:
