@@ -3,7 +3,6 @@ on:
   push:
     branches: [ main ]
     paths:
-      - .github/workflows
       - 'lambda/**'
   workflow_dispatch:
 jobs:
@@ -31,8 +30,4 @@ jobs:
       - name: SAM Build
         run: sam build
       - name: SAM Deploy
-        run: sam deploy --no-confirm-changeset \
-          --no-fail-on-empty-changeset \
-          --stack-name spacex-etl-stack \
-          --capabilities CAPABILITY_IAM \
-          --resolve-s3
+        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name spacex-etl-stack --capabilities CAPABILITY_IAM --resolve-s3
