@@ -19,15 +19,6 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.13'
-      - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          export PATH="$HOME/.local/bin:$PATH"
-          poetry self add poetry-plugin-export
-      - name: Export requirements.txt
-        run: poetry export -f requirements.txt --output requirements.txt --without-hashes
-
       - name: Setup AWS SAM
         uses: aws-actions/setup-sam@v2
 
