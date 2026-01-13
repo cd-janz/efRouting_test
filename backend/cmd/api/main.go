@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"os"
 	"spacex_analytics/internal/infra/config"
 	"spacex_analytics/internal/infra/entities"
@@ -11,11 +12,16 @@ import (
 	"github.com/danielgtaylor/huma/v2/adapters/humaecho"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 )
 
 func main() {
 	e := echo.New()
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{http.MethodGet},
+	}))
 	defer e.Close()
 	err := godotenv.Load()
 	if err != nil {

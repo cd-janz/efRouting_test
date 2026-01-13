@@ -4,7 +4,10 @@ import (
 	"context"
 	"spacex_analytics/internal/infra/config"
 	"spacex_analytics/internal/infra/entities"
+	"spacex_analytics/internal/infra/models"
 	"time"
+
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 )
 
 type DynamoLaunchRepository struct {
@@ -17,13 +20,51 @@ func NewDynamoLaunchRepository(db *config.DynamoDB[entities.LaunchEntity]) *Dyna
 	}
 }
 
-func (r *DynamoLaunchRepository) FetchAll(ctx context.Context, cursor *string, limit *int32) ([]entities.LaunchEntity, *string, error) {
-	client := r.db.NewRequest()
+func (r *DynamoLaunchRepository) buildFilterExpression(params models.ListAllParams) (expression.Expression, error) {
+	var filter expression.ConditionBuilder
+	var isFilterSet bool
+
+	addCondition := func(cond expression.ConditionBuilder) {
+		if !isFilterSet {
+			filter = cond
+			isFilterSet = true
+		} else {
+			filter = filter.And(cond)
+		}
+	}
+
+	if params.Mission != "" {
+		addCondition(expression.Name("mission_name").BeginsWith(params.Mission))
+	}
+	builder := expression.NewBuilder()
+	if isFilterSet {
+		builder = builder.WithFilter(filter)
+	}
+
+	return builder.Build()
+}
+
+func (r *DynamoLaunchRepository) FetchAll(ctx context.Context, params models.ListAllParams) ([]entities.LaunchEntity, *string, error) {
+	req := r.db.NewRequest()
+
+	if params.HasFilters() {
+		expr, err := r.buildFilterExpression(params)
+		if err != nil {
+			return nil, nil, err
+		}
+		req.Filter(expr)
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
 	defer cancel()
-	res, cursor, err := client.From(cursor).Limit(limit).GetAll(ctx)
+
+	limit := params.Limit
+	cursor := params.Cursor
+
+	res, nextCursor, err := req.From(&cursor).Limit(&limit).GetAll(ctx)
+
 	if err != nil {
 		return nil, nil, err
 	}
-	return res, cursor, nil
+	return res, nextCursor, nil
 }

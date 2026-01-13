@@ -4,12 +4,14 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/labstack/gommon/log"
@@ -20,6 +22,8 @@ type DynamoDB[T any] struct {
 	table    string
 	limit    int32
 	startKey map[string]types.AttributeValue
+	expr     expression.Expression
+	hasExpr  bool
 }
 
 func newDynamoClient() *dynamodb.Client {
@@ -40,6 +44,11 @@ func newDynamoClient() *dynamodb.Client {
 		})
 	}
 	return dynamodb.NewFromConfig(cfg)
+}
+func (d *DynamoDB[T]) Filter(expr expression.Expression) *DynamoDB[T] {
+	d.expr = expr
+	d.hasExpr = true
+	return d
 }
 
 func NewDynamoDB[T any](table string) *DynamoDB[T] {
@@ -82,6 +91,11 @@ func (d *DynamoDB[T]) GetAll(ctx context.Context) ([]T, *string, error) {
 	if d.startKey != nil {
 		input.ExclusiveStartKey = d.startKey
 	}
+	if d.hasExpr {
+		input.FilterExpression = d.expr.Filter()
+		input.ExpressionAttributeNames = d.expr.Names()
+		input.ExpressionAttributeValues = d.expr.Values()
+	}
 	out, err := d.client.Scan(ctx, input)
 	if err != nil {
 		return nil, nil, err
@@ -91,6 +105,7 @@ func (d *DynamoDB[T]) GetAll(ctx context.Context) ([]T, *string, error) {
 	if err != nil {
 		return nil, nil, err
 	}
+	fmt.Printf("%d registros de %d totales \n", out.Count, out.ScannedCount)
 	if out.LastEvaluatedKey != nil {
 		nextCursor := d.encodeCursor(out.LastEvaluatedKey)
 		return results, &nextCursor, nil
