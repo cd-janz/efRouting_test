@@ -2,13 +2,16 @@ import axios from "axios";
 import IRequest from "@/core/types/IRequest";
 import {error} from "next/dist/build/output/log";
 
-const base = process.env.NEXT_PUBLIC_API_URL;
-if(!base) throw new Error("No base URL");
+const getBaseUrl = () => {
+    if (typeof window !== 'undefined') {
+        return '';
+    }
+    return process.env.INTERNAL_API_URL || 'http://localhost:8081';
+};
 const agent = axios.create({
-    baseURL: base.concat("/api/v1"),
+    baseURL: `${getBaseUrl()}/api/v1`,
     adapter: "fetch",
-})
-
+});
 export type response<T> = {
     data: T,
     message: string

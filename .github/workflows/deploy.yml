@@ -54,6 +54,12 @@ jobs:
         run: |
           npm install
 
+      - name: Bundle Lambda Dependencies
+        run: |
+          cd lambda
+          pip install -r requirements.txt -t .
+          cd ..
+
       - name: CDK Deploy All
         run: |
           npx cdk bootstrap
