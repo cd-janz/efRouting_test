@@ -7,7 +7,7 @@ if (!BASE_URL) {
     console.warn("NEXT_PUBLIC_API_URL no está definida. Las peticiones fallarán.");
 }
 const agent = axios.create({
-    baseURL: `${BASE_URL}/api/v1`,
+    baseURL: "/api/v1",
     adapter: "fetch",
 });
 export type response<T> = {
