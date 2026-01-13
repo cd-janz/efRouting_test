@@ -1,7 +1,7 @@
-efRouting: SpaceX Launch Tracking System 🚀
+efRouting: SpaceX Launch Tracking System
 
 Una solución Full Stack moderna para visualizar lanzamientos de SpaceX, construida bajo los principios de eficiencia ("Go efficient"), infraestructura como código y arquitectura serverless/microservicios.
-🔗 Enlaces del Despliegue (Live Demo)
+Enlaces del Despliegue (Live Demo)
 
     Nota: La infraestructura completa ha sido desplegada automáticamente mediante AWS CDK.
 
@@ -29,7 +29,7 @@ ECS_Back --> DDB[(DynamoDB: SpaceXLaunches)]
 
 Tecnologías Clave
 
-    Frontend: Next.js 14 (Standalone mode) + Bun/Node.js.
+    Frontend: Next.js 16 (Standalone mode+Rewrites) + Bun/Node.js.
 
     Backend API: Go (Golang) + Echo + Huma (OpenAPI/Swagger auto-gen).
 
@@ -63,14 +63,14 @@ En lugar de configuraciones manuales, toda la infraestructura (desde la VPC hast
 
     Mayor seguridad al gestionar roles de IAM con el principio de privilegio mínimo (grantReadWriteData).
 
-🚀 Instalación y Ejecución Local
+Instalación y Ejecución Local
 
 El proyecto incluye un entorno local completo basado en Docker Compose para facilitar el desarrollo sin depender de AWS.
 Prerrequisitos
 
     Docker & Docker Compose
 
-    Node.js 20+ (para CDK)
+    Node.js 22+ (para CDK)
 
     AWS CLI configurado (para despliegue)
 
@@ -93,6 +93,8 @@ docker-compose up --build
 
     DynamoDB Admin: http://localhost:8001
 
+    Python Lambda API: http://localhost:8080
+
 Ejecutar Pruebas (Backend/Lambda):
 Bash
 
@@ -101,7 +103,7 @@ Bash
     pip install -r requirements.txt
     pytest
 
-☁️ Guía de Despliegue (AWS)
+Guía de Despliegue (AWS)
 
 El despliegue está automatizado mediante GitHub Actions, pero puede realizarse manualmente con CDK.
 
@@ -143,23 +145,9 @@ El flujo de integración continua está definido en .github/workflows/deploy.yml
 
 Durante el desarrollo de la prueba técnica, se superaron varios desafíos interesantes:
 
-    Docker Networking & CORS:
-
-        Reto: La comunicación entre el Frontend (Next.js) y el Backend (Go) fallaba en local debido a la diferencia entre localhost (para el navegador) y los nombres de servicio DNS internos de Docker.
-
-        Solución: Se implementó una configuración híbrida en el Backend que detecta el entorno (APP_ENV). En local usa nombres de servicio Docker para hablar con DynamoDB, pero permite CORS para el navegador.
-
-    Next.js Environment Variables en Build Time:
-
-        Reto: Las variables NEXT_PUBLIC_ se "queman" (hardcode) en el bundle estático de JS al momento de compilar la imagen Docker, haciendo difícil inyectar la URL del Load Balancer dinámicamente.
-
-        Solución: Se utilizaron buildArgs en CDK y en el Dockerfile para inyectar la URL del Load Balancer generada por AWS durante la fase de construcción de la imagen.
-
-    Optimización de Imágenes:
-
-        Reto: Las imágenes iniciales de Go y Node eran demasiado pesadas para un despliegue rápido.
-
-        Solución: Se migró a imágenes alpine y se usaron Multi-stage builds, reduciendo significativamente el tamaño final y la superficie de ataque.
+    Desconocimiento:
+        
+        Debido a el prolongado periodo de tiempo sin usar python mas que para scripts de automatizacion, aquello que mas me costo fue adaptarme nuevamente a su sintaxis y logica, ha cambiado mucho desde la 3.9
 
 📸 Evidencias del Proceso
 Pipeline de GitHub Actions (Exitoso)
