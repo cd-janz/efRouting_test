@@ -7,7 +7,7 @@ Enlaces del Despliegue (Live Demo)
 
     Aplicación Web (Frontend): [ PONER TU URL DEL FRONTEND AQUI - LA QUE SALE DE CDK ]
 
-    API Documentation (Swagger): [ PONER TU URL DE LA LAMBDA AQUI ]/docs (o la del Backend de Go si habilitaste Swagger ahí)
+    GO API Documentation (Swagger): [http://efrout-backe-locqqifm0c2q-196445216.us-west-1.elb.amazonaws.com/docs](http://efrout-backe-locqqifm0c2q-196445216.us-west-1.elb.amazonaws.com/docs)
 
     Lambda Manual Trigger: [ PONER TU URL DE LA LAMBDA AQUI ]
 
