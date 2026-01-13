@@ -70,7 +70,7 @@ export class ComputeStack extends cdk.Stack {
         });
 
         backendService.targetGroup.configureHealthCheck({
-            path: '/api/v1/docs',
+            path: '/docs',
             healthyHttpCodes: '200-404',
             interval: cdk.Duration.seconds(30),
             timeout: cdk.Duration.seconds(5),
