@@ -69,6 +69,15 @@ export class ComputeStack extends cdk.Stack {
             publicLoadBalancer: true,
         });
 
+        backendService.targetGroup.configureHealthCheck({
+            path: '/api/v1/docs',
+            healthyHttpCodes: '200-404',
+            interval: cdk.Duration.seconds(30),
+            timeout: cdk.Duration.seconds(5),
+            healthyThresholdCount: 2,
+            unhealthyThresholdCount: 5,
+        });
+
         props.table.grantReadWriteData(backendService.taskDefinition.taskRole);
 
         const frontendService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'FrontendNextService', {
