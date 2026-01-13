@@ -5,9 +5,9 @@ Enlaces del Despliegue (Live Demo)
 
     Nota: La infraestructura completa ha sido desplegada automáticamente mediante AWS CDK.
 
-    Aplicación Web (Frontend): [ PONER TU URL DEL FRONTEND AQUI - LA QUE SALE DE CDK ]
+    Aplicación Web (Frontend): http://efrout-front-n79f1xtyz0sb-575995812.us-west-1.elb.amazonaws.com/launches/list
 
-    GO API Documentation (Swagger): [http://efrout-backe-locqqifm0c2q-196445216.us-west-1.elb.amazonaws.com/docs](http://efrout-backe-locqqifm0c2q-196445216.us-west-1.elb.amazonaws.com/docs)
+    GO API Documentation (Swagger): http://efrout-backe-czuqb9d7cny5-1782135104.us-west-1.elb.amazonaws.com/docs
 
     Lambda Manual Trigger: [ PONER TU URL DE LA LAMBDA AQUI ]
 
