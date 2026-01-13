@@ -1,5 +1,6 @@
 services:
 
+  # --- Database ---
   dynamodb-local:
     image: amazon/dynamodb-local:latest
     container_name: dynamodb-local
@@ -33,6 +34,23 @@ services:
     networks:
       - spacex-network
 
+  dynamodb-setup:
+    image: amazon/aws-cli
+    container_name: dynamodb-setup
+    environment:
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+      - AWS_DEFAULT_REGION=us-east-1
+    volumes:
+      - ./build/scripts:/scripts
+    entrypoint: ["/bin/bash", "/scripts/create_db.sh"]
+    depends_on:
+      dynamodb-local:
+        condition: service_healthy
+    networks:
+      - spacex-network
+
+  # --- Backend (Lambda API) ---
   fast-api:
     build:
       context: lambda
@@ -43,9 +61,48 @@ services:
     environment:
       - DYNAMODB_TABLE_NAME=SpaceXLaunches
       - DYNAMODB_URL=http://dynamodb-local:8000
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+      - AWS_DEFAULT_REGION=us-east-1
     depends_on:
       dynamodb-local:
         condition: service_healthy
+    networks:
+      - spacex-network
+
+  backend-api:
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    container_name: spacex-backend-api
+    ports:
+      - "8081:8081"
+    environment:
+      - APP_ENV=dev
+      - DYNAMODB_URL=http://dynamodb-local:8000
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+      - DYNAMODB_TABLE_NAME=SpaceXLaunches
+    depends_on:
+      - dynamodb-local
+    networks:
+      - spacex-network
+
+  # --- Frontend (Next.js + Bun) ---
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8081
+    container_name: spacex-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8081
+    depends_on:
+      - fast-api
     networks:
       - spacex-network
 

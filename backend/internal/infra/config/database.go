@@ -5,11 +5,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"os"
+	"spacex_analytics/internal/infra/dto"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/labstack/gommon/log"
@@ -20,26 +22,43 @@ type DynamoDB[T any] struct {
 	table    string
 	limit    int32
 	startKey map[string]types.AttributeValue
+	expr     expression.Expression
+	hasExpr  bool
 }
 
 func newDynamoClient() *dynamodb.Client {
-	cfg, err := config.LoadDefaultConfig(context.TODO(),
-		config.WithRegion("us-west-1"),
-	)
-	if err != nil {
-		log.Fatalf("System's not able to load config: %v", err)
-	}
-	env := os.Getenv("APP_ENV")
-	log.Infof("env %v", env)
-	if env == "dev" {
-		return dynamodb.NewFromConfig(cfg, func(o *dynamodb.Options) {
-			o.BaseEndpoint = aws.String("http://localhost:8000")
-			o.Credentials = aws.NewCredentialsCache(
-				credentials.NewStaticCredentialsProvider("DUMMYIDEXAMPLE", "DUMMYIDEXAMPLE", ""),
-			)
-		})
-	}
-	return dynamodb.NewFromConfig(cfg)
+    cfg, err := config.LoadDefaultConfig(context.TODO(),
+       config.WithRegion("us-east-1"),
+    )
+    if err != nil {
+       log.Fatalf("System's not able to load config: %v", err)
+    }
+
+    env := os.Getenv("APP_ENV")
+    dbUrl := os.Getenv("DYNAMODB_URL")
+
+    log.Infof("env: %v, url: %v", env, dbUrl)
+
+    if env == "dev" || dbUrl != "" {
+       return dynamodb.NewFromConfig(cfg, func(o *dynamodb.Options) {
+          if dbUrl != "" {
+              o.BaseEndpoint = aws.String(dbUrl)
+          } else {
+              o.BaseEndpoint = aws.String("http://localhost:8000")
+          }
+
+          o.Credentials = aws.NewCredentialsCache(
+             credentials.NewStaticCredentialsProvider("local", "local", ""),
+          )
+       })
+    }
+
+    return dynamodb.NewFromConfig(cfg)
+}
+func (d *DynamoDB[T]) Filter(expr expression.Expression) *DynamoDB[T] {
+	d.expr = expr
+	d.hasExpr = true
+	return d
 }
 
 func NewDynamoDB[T any](table string) *DynamoDB[T] {
@@ -72,7 +91,8 @@ func (d *DynamoDB[T]) Limit(limit *int32) *DynamoDB[T] {
 	return d
 }
 
-func (d *DynamoDB[T]) GetAll(ctx context.Context) ([]T, *string, error) {
+// return: items, cursor, total, filtered, error
+func (d *DynamoDB[T]) scanAll(ctx context.Context) ([]T, *string, *uint32, *uint32, error) {
 	input := &dynamodb.ScanInput{
 		TableName: &d.table,
 	}
@@ -82,24 +102,55 @@ func (d *DynamoDB[T]) GetAll(ctx context.Context) ([]T, *string, error) {
 	if d.startKey != nil {
 		input.ExclusiveStartKey = d.startKey
 	}
+	if d.hasExpr {
+		input.FilterExpression = d.expr.Filter()
+		input.ExpressionAttributeNames = d.expr.Names()
+		input.ExpressionAttributeValues = d.expr.Values()
+	}
 	out, err := d.client.Scan(ctx, input)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	var results []T
 	err = attributevalue.UnmarshalListOfMaps(out.Items, &results)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, nil, err
 	}
+	total := uint32(out.ScannedCount)
+	filtered := uint32(out.Count)
 	if out.LastEvaluatedKey != nil {
 		nextCursor := d.encodeCursor(out.LastEvaluatedKey)
-		return results, &nextCursor, nil
+		return results, &nextCursor, &total, &filtered, nil
 	}
-	return results, nil, nil
+	return results, nil, &total, &filtered, nil
 }
 
-func (d *DynamoDB[T]) Get(ctx context.Context, id *string) (*T, error) {
-	return nil, nil
+func (d *DynamoDB[T]) ScanAllYears(ctx context.Context) ([]dto.SimplyLaunchDTO, error) {
+	input := &dynamodb.ScanInput{
+		TableName:            &d.table,
+		ProjectionExpression: aws.String("launch_id, launch_date_utc, success, upcoming"),
+	}
+	out, err := d.client.Scan(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+	var results []dto.SimplyLaunchDTO
+	err = attributevalue.UnmarshalListOfMaps(out.Items, &results)
+	if err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+func (d *DynamoDB[T]) GetAll(ctx context.Context) ([]T, *string, error) {
+	res, cursor, _, _, err := d.scanAll(ctx)
+	return res, cursor, err
+}
+
+// GetRate could be optimized getting less fields with scan
+func (d *DynamoDB[T]) GetRate(ctx context.Context) (*uint32, *uint32, error) {
+	_, _, total, filtered, err := d.scanAll(ctx)
+	return total, filtered, err
 }
 
 func (d *DynamoDB[T]) encodeCursor(lastEvaluatedKey map[string]types.AttributeValue) string {

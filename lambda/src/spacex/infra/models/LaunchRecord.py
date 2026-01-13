@@ -17,13 +17,6 @@ class LaunchRecord(BaseModel):
     def serialize_dt(self, dt: datetime, _info):
         return dt.isoformat()
 
-    @computed_field
-    @property
-    def status(self) -> str:
-        if self.upcoming:
-            return "upcoming"
-        return "success" if self.success else "failed"
-
     class ConfigDict:
         populate_by_name = True
         extra = "ignore"
