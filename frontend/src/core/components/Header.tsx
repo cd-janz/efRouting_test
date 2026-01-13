@@ -13,9 +13,9 @@ export default function Header(){
         <>
             <header className="border-b border-gray-200">
                 <h2>{header.title}</h2>
-                <MenuIcon onClick={()=>setIsActive(true)}
+                <MenuIcon onClick={()=>setIsActive(prevState => !prevState)}
                           width={26} height={26}
-                          className="cursor-pointer p-0.5 hover:bg-gray-600 rounded-md hover:text-white" />
+                          className="cursor-pointer lg:hidden p-0.5 hover:bg-gray-600 rounded-md hover:text-white" />
             </header>
             <MobileSidebar active={isActive} handle={handleClose} items={header.nav}/>
         </>

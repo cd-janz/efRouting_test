@@ -20,7 +20,7 @@ export default function MobileSidebar(props: Props){
                         <span className="capitalize font-light text-sm">{item.label}</span>
                         <div className="pl-2 flex flex-col gap-2">
                             {item.items.map((item2, index2) =>(
-                                <Link key={index2} href={item.basePath.concat(item2.path)}
+                                <Link onClick={props.handle} key={index2} href={item.basePath.concat(item2.path)}
                                       className="px-8 py-2 capitalize font-light bg-blue-50 rounded-md focus:bg-blue-400">
                                     {item2.label}
                                 </Link>

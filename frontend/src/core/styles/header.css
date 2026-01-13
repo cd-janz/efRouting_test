@@ -13,6 +13,15 @@ header h2{
 header figure{
     cursor: pointer;
 }
+header.desk{
+    padding: 0;
+    height: 50px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 15px;
+}
 .sidebar.mobile{
     position: fixed;
     top: 0;
@@ -25,6 +34,16 @@ header figure{
     display: flex;
     flex-direction: column;
     gap: 50px;
+}
+@media(min-width: 800px){
+    .sidebar.mobile{
+        width: 50dvw;
+    }
+}
+@media(min-width: 1024px){
+    .sidebar.mobile{
+        display: none;
+    }
 }
 .sidebar.mobile.open{
     left: 0;

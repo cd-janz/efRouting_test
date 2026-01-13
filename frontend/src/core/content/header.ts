@@ -1,6 +1,10 @@
+import {CircleGaugeIcon, LucideProps, TablePropertiesIcon} from "lucide-react";
+import {ForwardRefExoticComponent, RefAttributes} from "react";
+
 export interface INavItem{
     label: string;
     path: string;
+    icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>
 }
 export interface INavGroup{
     label: string;
@@ -19,8 +23,8 @@ const header: IHeader = {
             label: "launches",
             basePath: "/launches",
             items: [
-                { label: "list", path: '/list' },
-                { label: "dashboard", path: "/dashboard" },
+                { label: "list", path: '/list', icon: TablePropertiesIcon },
+                { label: "dashboard", path: "/dashboard", icon: CircleGaugeIcon },
             ]
         }
     ]

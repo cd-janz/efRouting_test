@@ -65,10 +65,10 @@ export function TableSearch(props: TableSearchProps){
     }, [inputValue, value, hasChange]);
 
     return(
-        <div className="flex items-center gap-0.5 w-full">
+        <div className="flex items-center gap-0.5 w-fit">
             <div className="flex items-center border border-gray-200 w-fit py-0.5 pl-2 gap-1 h-10 rounded-l-md">
                 <SearchIcon className="text-gray-400" width={24} height={24}/>
-                <input type="text" className="w-full outline-none placeholder:text-sm placeholder:font-light"
+                <input type="text" className="w-full md:w-87.5 outline-none placeholder:text-sm placeholder:font-light"
                        onChange={(e)=> handleInput(e.currentTarget.value, type, value)}
                        value={inputValue} placeholder="No data typed"/>
             </div>

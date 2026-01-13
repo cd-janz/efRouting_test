@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"os"
+	"spacex_analytics/internal/infra/dto"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -81,7 +81,8 @@ func (d *DynamoDB[T]) Limit(limit *int32) *DynamoDB[T] {
 	return d
 }
 
-func (d *DynamoDB[T]) GetAll(ctx context.Context) ([]T, *string, error) {
+// return: items, cursor, total, filtered, error
+func (d *DynamoDB[T]) scanAll(ctx context.Context) ([]T, *string, *uint32, *uint32, error) {
 	input := &dynamodb.ScanInput{
 		TableName: &d.table,
 	}
@@ -98,23 +99,48 @@ func (d *DynamoDB[T]) GetAll(ctx context.Context) ([]T, *string, error) {
 	}
 	out, err := d.client.Scan(ctx, input)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	var results []T
 	err = attributevalue.UnmarshalListOfMaps(out.Items, &results)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, nil, err
 	}
-	fmt.Printf("%d registros de %d totales \n", out.Count, out.ScannedCount)
+	total := uint32(out.ScannedCount)
+	filtered := uint32(out.Count)
 	if out.LastEvaluatedKey != nil {
 		nextCursor := d.encodeCursor(out.LastEvaluatedKey)
-		return results, &nextCursor, nil
+		return results, &nextCursor, &total, &filtered, nil
 	}
-	return results, nil, nil
+	return results, nil, &total, &filtered, nil
 }
 
-func (d *DynamoDB[T]) Get(ctx context.Context, id *string) (*T, error) {
-	return nil, nil
+func (d *DynamoDB[T]) ScanAllYears(ctx context.Context) ([]dto.SimplyLaunchDTO, error) {
+	input := &dynamodb.ScanInput{
+		TableName:            &d.table,
+		ProjectionExpression: aws.String("launch_id, launch_date_utc, success, upcoming"),
+	}
+	out, err := d.client.Scan(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+	var results []dto.SimplyLaunchDTO
+	err = attributevalue.UnmarshalListOfMaps(out.Items, &results)
+	if err != nil {
+		return nil, err
+	}
+	return results, nil
+}
+
+func (d *DynamoDB[T]) GetAll(ctx context.Context) ([]T, *string, error) {
+	res, cursor, _, _, err := d.scanAll(ctx)
+	return res, cursor, err
+}
+
+// GetRate could be optimized getting less fields with scan
+func (d *DynamoDB[T]) GetRate(ctx context.Context) (*uint32, *uint32, error) {
+	_, _, total, filtered, err := d.scanAll(ctx)
+	return total, filtered, err
 }
 
 func (d *DynamoDB[T]) encodeCursor(lastEvaluatedKey map[string]types.AttributeValue) string {

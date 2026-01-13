@@ -59,7 +59,7 @@ export default function useTable(url: string){
 
     useEffect(()=>{
         // Inst first load
-        getNextStack().catch(()=> console.log("Error loading launches"));
+        getNextStack(undefined, true).catch(()=> console.log("Error loading launches"));
     }, [])
 
     return { data, loading, hasMore, getNextStack }

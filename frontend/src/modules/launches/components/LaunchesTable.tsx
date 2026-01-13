@@ -20,8 +20,8 @@ export default function LaunchesTable(){
     }, [])
     return(
         <>
-            <div className="flex items-center justify-between gap-10">
-                <div className="hidden"/>
+            <div className="flex items-center justify-center sm:justify-between gap-5 px-2 py-2 lg:px-5">
+                <div className="hidden sm:block sm:w-full"/>
                 <TableSearch filters={filters}
                              onSearch={(value, filter, reset)=> {
                                  console.log("value2: ", value);
@@ -33,8 +33,8 @@ export default function LaunchesTable(){
                                  table.getNextStack({key: filter, value: value}).catch(err => console.log(err));
                              }}/>
             </div>
-            <Table>
-                <TableCaption>
+            <Table className="px-2">
+                <TableCaption className="py-2">
                     <button className="bg-blue-600 capitalize text-white w-80 h-9 rounded-xl"
                             onClick={() => table.getNextStack()}>
                         {table.hasMore ? "load more" : "ain't more data to show"}
@@ -56,9 +56,9 @@ export default function LaunchesTable(){
                     {table.data !== null && table.data.map((row, i) => (
                         <TableRow key={row.launch_id}>
                             <TableCell>{i+1}</TableCell>
-                            <TableCell className="max-w-24 overflow-hidden text-ellipsis">{row.launch_id}</TableCell>
+                            <TableCell className="max-w-24 lg:max-w-32 xl:max-w-40 2xl:max-w-none overflow-hidden text-ellipsis">{row.launch_id}</TableCell>
                             <TableCell>{row.mission_name}</TableCell>
-                            <TableCell className="max-w-24 overflow-hidden text-ellipsis">{row.rocket_id}</TableCell>
+                            <TableCell className="max-w-24 lg:max-w-32 xl:max-w-40 2xl:max-w-none overflow-hidden text-ellipsis">{row.rocket_id}</TableCell>
                             <TableCell>{handleDate(row.launch_date)}</TableCell>
                             <TableCell><TableStatus label={row.success ? "right" : "fail"} status={row.success}/></TableCell>
                             <TableCell><TableStatus label={row.upcoming ? "yes" : "no"} status={row.upcoming}/></TableCell>
