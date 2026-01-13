@@ -27,8 +27,12 @@ type DynamoDB[T any] struct {
 }
 
 func newDynamoClient() *dynamodb.Client {
+    region := os.Getenv("AWS_REGION")
+    if region == "" {
+        region = "us-west-1"
+    }
     cfg, err := config.LoadDefaultConfig(context.TODO(),
-       config.WithRegion("us-east-1"),
+       config.WithRegion(region),
     )
     if err != nil {
        log.Fatalf("System's not able to load config: %v", err)

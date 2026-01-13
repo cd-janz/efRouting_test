@@ -68,7 +68,6 @@ export class ComputeStack extends cdk.Stack {
             },
             publicLoadBalancer: true,
         });
-
         backendService.targetGroup.configureHealthCheck({
             path: '/docs',
             healthyHttpCodes: '200-404',
