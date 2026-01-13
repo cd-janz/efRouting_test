@@ -94,6 +94,14 @@ export class ComputeStack extends cdk.Stack {
             },
             publicLoadBalancer: true,
         });
+        frontendService.targetGroup.configureHealthCheck({
+            path: "/launches/list",
+            healthyHttpCodes: '200-404',
+            interval: cdk.Duration.seconds(30),
+            timeout: cdk.Duration.seconds(5),
+            healthyThresholdCount: 2,
+            unhealthyThresholdCount: 5,
+        })
 
         new cdk.CfnOutput(this, 'LambdaManualEndpoint', { value: apiDataUrl.url });
         new cdk.CfnOutput(this, 'BackendURL', { value: backendService.loadBalancer.loadBalancerDnsName });
