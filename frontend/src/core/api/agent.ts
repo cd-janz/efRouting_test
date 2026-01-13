@@ -2,10 +2,6 @@ import axios from "axios";
 import IRequest from "@/core/types/IRequest";
 import {error} from "next/dist/build/output/log";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-if (!BASE_URL) {
-    console.warn("NEXT_PUBLIC_API_URL no está definida. Las peticiones fallarán.");
-}
 const agent = axios.create({
     baseURL: "/api/v1",
     adapter: "fetch",
