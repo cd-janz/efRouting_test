@@ -2,14 +2,12 @@ import axios from "axios";
 import IRequest from "@/core/types/IRequest";
 import {error} from "next/dist/build/output/log";
 
-const getBaseUrl = () => {
-    if (typeof window !== 'undefined') {
-        return '';
-    }
-    return process.env.INTERNAL_API_URL || 'http://localhost:8081';
-};
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+if (!BASE_URL) {
+    console.warn("NEXT_PUBLIC_API_URL no está definida. Las peticiones fallarán.");
+}
 const agent = axios.create({
-    baseURL: `${getBaseUrl()}/api/v1`,
+    baseURL: `${BASE_URL}/api/v1`,
     adapter: "fetch",
 });
 export type response<T> = {
