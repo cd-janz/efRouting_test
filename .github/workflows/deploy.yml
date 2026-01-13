@@ -39,10 +39,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -56,9 +62,8 @@ jobs:
 
       - name: Bundle Lambda Dependencies
         run: |
-          cd lambda
+          cd ../lambda
           pip install -r requirements.txt -t .
-          cd ..
 
       - name: CDK Deploy All
         run: |
