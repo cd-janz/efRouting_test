@@ -27,23 +27,33 @@ type DynamoDB[T any] struct {
 }
 
 func newDynamoClient() *dynamodb.Client {
-	cfg, err := config.LoadDefaultConfig(context.TODO(),
-		config.WithRegion("us-west-1"),
-	)
-	if err != nil {
-		log.Fatalf("System's not able to load config: %v", err)
-	}
-	env := os.Getenv("APP_ENV")
-	log.Infof("env %v", env)
-	if env == "dev" {
-		return dynamodb.NewFromConfig(cfg, func(o *dynamodb.Options) {
-			o.BaseEndpoint = aws.String("http://localhost:8000")
-			o.Credentials = aws.NewCredentialsCache(
-				credentials.NewStaticCredentialsProvider("DUMMYIDEXAMPLE", "DUMMYIDEXAMPLE", ""),
-			)
-		})
-	}
-	return dynamodb.NewFromConfig(cfg)
+    cfg, err := config.LoadDefaultConfig(context.TODO(),
+       config.WithRegion("us-east-1"),
+    )
+    if err != nil {
+       log.Fatalf("System's not able to load config: %v", err)
+    }
+
+    env := os.Getenv("APP_ENV")
+    dbUrl := os.Getenv("DYNAMODB_URL")
+
+    log.Infof("env: %v, url: %v", env, dbUrl)
+
+    if env == "dev" || dbUrl != "" {
+       return dynamodb.NewFromConfig(cfg, func(o *dynamodb.Options) {
+          if dbUrl != "" {
+              o.BaseEndpoint = aws.String(dbUrl)
+          } else {
+              o.BaseEndpoint = aws.String("http://localhost:8000")
+          }
+
+          o.Credentials = aws.NewCredentialsCache(
+             credentials.NewStaticCredentialsProvider("local", "local", ""),
+          )
+       })
+    }
+
+    return dynamodb.NewFromConfig(cfg)
 }
 func (d *DynamoDB[T]) Filter(expr expression.Expression) *DynamoDB[T] {
 	d.expr = expr
