@@ -76,15 +76,11 @@ export class ComputeStack extends cdk.Stack {
             memoryLimitMiB: 1024,
             cpu: 512,
             taskImageOptions: {
-                image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../../frontend'), {
-                    buildArgs: {
-                        NEXT_PUBLIC_API_URL: `http://${backendService.loadBalancer.loadBalancerDnsName}`
-                    }
-                }),
+                image: ecs.ContainerImage.fromAsset(path.join(__dirname, '../../frontend')),
                 containerPort: 3000,
                 environment: {
-                    NEXT_PUBLIC_API_URL: `http://${backendService.loadBalancer.loadBalancerDnsName}`,
-                    INTERNAL_API_URL: `http://${backendService.loadBalancer.loadBalancerDnsName}`
+                    INTERNAL_API_URL: `http://${backendService.loadBalancer.loadBalancerDnsName}`,
+                    NEXT_PUBLIC_API_URL: ''
                 }
             },
             publicLoadBalancer: true,
