@@ -1,4 +1,4 @@
-efRouting: SpaceX Launch Tracking System
+<img width="1419" height="613" alt="image" src="https://github.com/user-attachments/assets/ddd3c0b8-264a-4813-bf77-269244aea6f4" />efRouting: SpaceX Launch Tracking System
 
 Una solución Full Stack moderna para visualizar lanzamientos de SpaceX, construida bajo los principios de eficiencia ("Go efficient"), infraestructura como código y arquitectura serverless/microservicios.
 Enlaces del Despliegue (Live Demo)
@@ -9,7 +9,9 @@ Enlaces del Despliegue (Live Demo)
 
     GO API Documentation (Swagger): http://efrout-backe-czuqb9d7cny5-1782135104.us-west-1.elb.amazonaws.com/docs
 
-    Lambda Manual Trigger: [ PONER TU URL DE LA LAMBDA AQUI ]
+    Lambda Manual Trigger: https://ep5jexrobiq4aqukbzu3rufroe0zksay.lambda-url.us-west-1.on.aws/
+    
+![Frontend Image](https://raw.githubusercontent.com/cd-janz/projects_resourses/refs/heads/main/efRouting/ss1.png)
 
 🏛️ Arquitectura de la Solución
 
@@ -33,13 +35,15 @@ Tecnologías Clave
 
     Backend API: Go (Golang) + Echo + Huma (OpenAPI/Swagger auto-gen).
 
-    Ingestión de Datos: Python 3.12 + AWS Lambda + Mangum.
+    Ingestión de Datos: Python 3.12 + FastAPI + AWS Lambda Cron + AWS Lambda + Mangum.
 
     Base de Datos: Amazon DynamoDB (On-Demand Capacity).
 
     Infraestructura: AWS CDK (TypeScript) para el aprovisionamiento de VPC, ECS Cluster, Roles y Servicios.
 
     CI/CD: GitHub Actions.
+
+    ADICIONAL: Template SAM para lambda (eliminado por falta de relevancia en el proyecto)
 
 🛠️ Decisiones Técnicas y Patrones
 1. Backend: Hexagonal Architecture (Go)
@@ -150,14 +154,11 @@ Durante el desarrollo de la prueba técnica, se superaron varios desafíos inter
         Debido a el prolongado periodo de tiempo sin usar python mas que para scripts de automatizacion, aquello que mas me costo fue adaptarme nuevamente a su sintaxis y logica, ha cambiado mucho desde la 3.9
 
 📸 Evidencias del Proceso
-Pipeline de GitHub Actions (Exitoso)
 
-[ PON UNA CAPTURA DE PANTALLA DE TU GITHUB ACTIONS EN VERDE AQUÍ ]
-DynamoDB con Datos Reales (SpaceX)
+![Deployed Resources](https://raw.githubusercontent.com/cd-janz/projects_resourses/refs/heads/main/efRouting/ss2.png)
 
-[ PON UNA CAPTURA DE PANTALLA DE TU DYNAMODB O DYNAMODB-ADMIN AQUÍ ]
-Swagger Documentation
+![Services Routes](https://raw.githubusercontent.com/cd-janz/projects_resourses/refs/heads/main/efRouting/ss3.png)
 
-[ PON UNA CAPTURA DE PANTALLA DE TU SWAGGER UI AQUÍ ]
+![Go API Swagger](https://raw.githubusercontent.com/cd-janz/projects_resourses/refs/heads/main/efRouting/ss5.png)
 
 Go efficient, happy, and green. 🌿
