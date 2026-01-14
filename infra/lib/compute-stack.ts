@@ -21,9 +21,19 @@ export class ComputeStack extends cdk.Stack {
 
         const cluster = new ecs.Cluster(this, 'SpaceXCluster', { vpc });
 
+        const lambdaCode = lambda.Code.fromAsset(path.join(__dirname, '../../lambda'), {
+            bundling: {
+                image: lambda.Runtime.PYTHON_3_12.bundlingImage,
+                command: [
+                    'bash', '-c',
+                    'pip install -r requirements.txt -t /asset-output && cp -au . /asset-output'
+                ],
+            },
+        });
+
         const apiLambda = new lambda.Function(this, 'SpaceXApiFunction', {
             runtime: lambda.Runtime.PYTHON_3_12,
-            code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda')),
+            code: lambdaCode,
             handler: 'src.spacex.main.handler',
             environment: {
                 TABLE_NAME: props.table.tableName,
@@ -33,7 +43,7 @@ export class ComputeStack extends cdk.Stack {
 
         const cronLambda = new lambda.Function(this, 'SpaceXCronFunction', {
             runtime: lambda.Runtime.PYTHON_3_12,
-            code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda')),
+            code: lambdaCode,
             handler: 'src.spacex.main.scheduled_handler',
             environment: {
                 TABLE_NAME: props.table.tableName,
