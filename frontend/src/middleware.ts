@@ -2,13 +2,21 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-    if (request.nextUrl.pathname.startsWith('/api/v1')) {
-        console.log("🔴 [MIDDLEWARE VIVO] --------------------------------");
-        console.log("👉 Petición detectada:", request.nextUrl.pathname);
-        console.log("👉 INTERNAL_API_URL:", process.env.INTERNAL_API_URL || "VACÍA/UNDEFINED");
-        console.log("👉 NEXT_PUBLIC_API_URL:", process.env.NEXT_PUBLIC_API_URL);
-        console.log("----------------------------------------------------");
+    const { pathname, search } = request.nextUrl;
+    if (pathname.startsWith('/api/v1')) {
+        const backendUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL;
+        console.log(`🚀 [MIDDLEWARE PROXY] Redirigiendo ${pathname} -> ${backendUrl}`);
+        if (!backendUrl) {
+            return NextResponse.json(
+                { error: 'Configuration Error: Backend URL missing' },
+                { status: 500 }
+            );
+        }
+        const targetUrl = new URL(pathname + search, backendUrl);
+
+        return NextResponse.rewrite(targetUrl);
     }
+
     return NextResponse.next();
 }
 
