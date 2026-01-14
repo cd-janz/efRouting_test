@@ -151,7 +151,11 @@ Durante el desarrollo de la prueba técnica, se superaron varios desafíos inter
 
     Desconocimiento:
         
-        Debido a el prolongado periodo de tiempo sin usar python mas que para scripts de automatizacion, aquello que mas me costo fue adaptarme nuevamente a su sintaxis y logica, ha cambiado mucho desde la 3.9
+        Debido a el prolongado periodo de tiempo sin usar python mas que para scripts de automatizacion, aquello que mas me costo fue adaptarme nuevamente a su sintaxis y logica, ha cambiado mucho desde la 3.9.
+
+    Entorno de cloud:
+    
+        En lo personal, y por experiencia propia suelo usar en su mayoria azure para mis proyectos personales. Entorpese mas la situacion, entender el IaC cuando estas acostumbrado al uso de herramientas visuales.
 
 📸 Evidencias del Proceso
 
