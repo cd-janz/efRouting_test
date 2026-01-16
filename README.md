@@ -4,12 +4,6 @@ Una solución Full Stack moderna para visualizar lanzamientos de SpaceX, constru
 Enlaces del Despliegue (Live Demo)
 
     Nota: La infraestructura completa ha sido desplegada automáticamente mediante AWS CDK.
-
-    Aplicación Web (Frontend): http://efrout-front-n79f1xtyz0sb-575995812.us-west-1.elb.amazonaws.com/launches/list
-
-    GO API Documentation (Swagger): http://efrout-backe-czuqb9d7cny5-1782135104.us-west-1.elb.amazonaws.com/docs
-
-    Lambda Manual Trigger: https://ep5jexrobiq4aqukbzu3rufroe0zksay.lambda-url.us-west-1.on.aws/
     
 ![Frontend Image](https://raw.githubusercontent.com/cd-janz/projects_resourses/refs/heads/main/efRouting/ss1.png)
 
